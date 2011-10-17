@@ -455,6 +455,8 @@
     }
 }
 
+NSInteger compareViewDepth(id obj1, id obj2, void *context);
+
 NSInteger compareViewDepth(id obj1, id obj2, void *context)
 {
     iCarousel *carousel = context;
