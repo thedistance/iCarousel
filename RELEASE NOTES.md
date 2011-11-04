@@ -1,3 +1,16 @@
+Version 1.5.8
+
+- Fixed bug in previous UITableCell fix
+- No longer gets stuck at a negative offset when inserting items into an empty carousel
+- Example app no longer crashes when inserting item into empty carousel
+- Better behaviour when reloading carousel
+
+Version 1.5.7
+
+- Fixed ARC compatibility issues with sorting logic
+- UISwitches, UISliders and UITableCells now work correctly with item views
+- Fixed bug in carousel:shouldSelectItemAtIndex: delegate logic
+
 Version 1.5.6
 
 - Added reloadItemAtIndex:animated: method.

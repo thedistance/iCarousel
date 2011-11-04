@@ -8,10 +8,29 @@ iCarousel is a class designed to simplify the implementation of various types of
 Not all features of iCarousel are currently supported on Mac OS. I hope to address this in future. Please refer to the documentation below for details.
 
 
+Supported iOS & SDK Versions
+-----------------------------
+
+* Supported build target - iOS 5.0 (Xcode 4.2)
+* Earliest supported deployment target - iOS 4.0 (Xcode 4.2)
+* Earliest compatible deployment target - iOS 3.2
+
+NOTE: 'Supported' means that the library has been tested with this version. 'Compatible' means that the library should work on this iOS version (i.e. it doesn't rely on any unavailable SDK features) but is no longer being tested for compatibility and may require tweaking or bug fixes to run correctly.
+
+
 Installation
 --------------
 
-To use the iCarousel class in an app, just drag the class files into your project and add the QuartzCore framework.
+To use the iCarousel class in an app, just drag the iCarousel class files (demo files and assets are not needed) into your project and add the QuartzCore framework.
+
+
+ARC Compatibility
+------------------
+
+iCarousel does not use automatic reference counting, but will convert using the ARC migration tool without any issues. However, in the interests of avoiding modifying the iCarousel library, which may cause unknown bugs or problems later when upgrading to a new version, a better approach is to specify in your ARC project that iCarousel's files should be excluded from the ARC validation process. To do that:
+
+1) Go to Project Settings, under Build Phases > Compile Sources
+2) Select the iCarousel.m file and add the -fno-objc-arc compiler flag
 
 
 Carousel Types
@@ -27,9 +46,10 @@ iCarousel supports the following built-in display types:
 - iCarouselTypeCoverFlow
 - iCarouselTypeCoverflow2
 
-You can also implement your own bespoke style using `iCarouselTypeCustom` and the `carousel:transformForItemView:withOffset:` delegate method.
+You can also implement your own bespoke carousel styles using `iCarouselTypeCustom` and the `carousel:transformForItemView:withOffset:` delegate method.
 
-NOTE: The difference between `iCarouselTypeCoverFlow` and `iCarouselTypeCoverFlow2` types is quite subtle, however the logic for `iCarouselTypeCoverFlow2` is substantially more complex. If you flick the carousel they are basically identical, but if you drag the carousel slowly with your finger the difference should be apparent.
+NOTE: The difference between `iCarouselTypeCoverFlow` and `iCarouselTypeCoverFlow2` types is quite subtle, however the logic for `iCarouselTypeCoverFlow2` is substantially more complex. If you flick the carousel they are basically identical, but if you drag the carousel slowly with your finger the difference should be apparent. `iCarouselTypeCoverFlow2` is designed to simulate the standard Apple CoverFlow effect as closely as possible and may change subtly in future in the interests of that goal.
+
 
 Properties
 --------------
@@ -140,7 +160,11 @@ By default, the carousel will come to rest at an exact item boundary when it is 
 	
 	@property (nonatomic, assign) BOOL scrollToItemBoundary;
 
-By default whenever the carousel stops moving it will automatically scroll to the nearest item boundary. If you set this property to NO, the carousel will not scroll after stopping and will stay wherever it is, even if it's not perfectly aligned on the current index. The exception to this is that if wrapping is disabled and `bounces` is set to YES then regardless of this setting, the carousel will automatically scroll back to the first or last item index if it comes to rest beyond the end of the carousel. 
+By default whenever the carousel stops moving it will automatically scroll to the nearest item boundary. If you set this property to NO, the carousel will not scroll after stopping and will stay wherever it is, even if it's not perfectly aligned on the current index. The exception to this is that if wrapping is disabled and `bounces` is set to YES then regardless of this setting, the carousel will automatically scroll back to the first or last item index if it comes to rest beyond the end of the carousel.
+
+	@property (nonatomic, assign) BOOL clipToBounds;
+	
+This is actually not a property of iCarousel but is inherited from UIView. It's included here because it's a frequently missed feature. Set this to YES to prevent the carousel item views overflowing their bounds. You can set this property in Interface Builder by ticking the 'Clip Subviews' option. Defaults to NO.
 
 
 Methods
@@ -276,12 +300,12 @@ Detecting Taps on Item Views
 
 There are two basic approaches to detecting taps on views in iCarousel on iOS. The first approach is to simply use the `carousel:didSelectItemAtIndex:` delegate method, which fires every time an item is tapped. If you are only interested in taps on the currently centered item, you can compare the `currentItemIndex` property against the index parameter of this method.
 
-Alternatively, if you want a little more control you can supply a UIButton or UIControl as the item view and handle the touch interactions yourself. See the iOS example project for a demo of how this is done (doesn't work on Mac OS; see below).
+Alternatively, if you want a little more control you can supply a UIButton or UIControl as the item view and handle the touch interactions yourself. See the Events test projects for an example of how this is done (doesn't work on Mac OS; see below).
 
-You can also nest UIControls within your item views and these will receive touches as expected.
+You can also nest UIControls within your item views and these will receive touches as expected (see the Controls test project for an example).
 
 If you wish to detect other types of interaction such as swipes, double taps or long presses, the simplest way is to attach a UIGestureRecognizer to your item view or its subviews before passing it to the carousel.
 
 Note that taps and gestures will be ignored on any item view except the currently selected one, unless you set the `centerItemWhenSelected` property to NO.
 
-On Mac OS there is no easy way to do detect clicks on carousel items currently. You cannot just supply an NSButton as your item view because the transforms applied to the item views mean that hit detection doesn't work properly. I'm investigating possible solutions to this (if you know a good way to fix this, please get in touch, or fork the project on github).
+On Mac OS there is no easy way to detect clicks on carousel items currently. You cannot just supply an NSButton as or inside your item view because the transforms applied to the item views mean that hit detection doesn't work properly. I'm investigating possible solutions to this (if you know a good way to fix this, please get in touch, or fork the project on github).
